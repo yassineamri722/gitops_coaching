@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task Management</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 3rem auto; padding: 0 1rem; background: #f4f7fb; color: #172033; }
+    main { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px #17203318; }
+    form { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
+    input:not([type="checkbox"]) { flex: 1; padding: .7rem; border: 1px solid #ccd3df; border-radius: 6px; }
+    button { padding: .7rem 1rem; border: 0; border-radius: 6px; background: #2563eb; color: white; cursor: pointer; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; align-items: center; gap: .7rem; padding: .8rem 0; border-bottom: 1px solid #edf0f5; }
+    li.done span { text-decoration: line-through; color: #8490a3; }
+    .delete { margin-left: auto; background: #dc2626; padding: .4rem .7rem; }
+    #status { color: #64748b; min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Task Management</h1>
+    <form id="task-form">
+      <input id="title" placeholder="What needs to be done?" required maxlength="200">
+      <button>Add task</button>
+    </form>
+    <p id="status"></p>
+    <ul id="tasks"></ul>
+  </main>
+  <script>
+    const API = 'http://localhost:8000';
+    const list = document.querySelector('#tasks');
+    const status = document.querySelector('#status');
+
+    async function loadTasks() {
+      try {
+        const response = await fetch(`${API}/api/tasks`);
+        if (!response.ok) throw Error();
+        const tasks = await response.json();
+        list.innerHTML = tasks.map(task => `
+          <li class="${task.completed ? 'done' : ''}">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, this.checked)">
+            <span>${escapeHtml(task.title)}</span>
+            <button class="delete" onclick="deleteTask(${task.id})">Delete</button>
+          </li>`).join('');
+        status.textContent = '';
+      } catch (_) {
+        status.textContent = 'Backend unavailable. Start the FastAPI server.';
+      }
+    }
+
+    async function toggleTask(id, completed) {
+      await fetch(`${API}/api/tasks/${id}`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({completed})
+      });
+      loadTasks();
+    }
+
+    async function deleteTask(id) {
+      await fetch(`${API}/api/tasks/${id}`, {method: 'DELETE'});
+      loadTasks();
+    }
+
+    document.querySelector('#task-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const input = document.querySelector('#title');
+      await fetch(`${API}/api/tasks`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title: input.value})
+      });
+      input.value = '';
+      loadTasks();
+    });
+
+    function escapeHtml(value) {
+      const element = document.createElement('div');
+      element.textContent = value;
+      return element.innerHTML;
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>

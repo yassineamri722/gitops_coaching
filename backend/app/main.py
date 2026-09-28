@@ -1,3 +1,4 @@
+#coaching
 from contextlib import asynccontextmanager
 import os
 from typing import Dict, Generator, List
@@ -15,6 +16,7 @@ CORS_ORIGINS = [
     origin.strip()
     for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
 ]
+
 
 
 @asynccontextmanager

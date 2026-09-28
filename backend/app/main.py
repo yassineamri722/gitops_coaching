@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 import os
-from typing import Generator
+from typing import Dict, Generator, List
 
 import psycopg
 from fastapi import Depends, FastAPI, HTTPException
@@ -55,17 +55,17 @@ def get_connection() -> Generator[psycopg.Connection, None, None]:
         yield connection
 
 
-def serialize(row: tuple) -> dict:
+def serialize(row: tuple) -> Dict:
     return {"id": row[0], "title": row[1], "completed": row[2]}
 
 
 @app.get("/health")
-def health() -> dict:
+def health() -> Dict:
     return {"status": "ok"}
 
 
 @app.get("/ready")
-def ready(connection: psycopg.Connection = Depends(get_connection)) -> dict:
+def ready(connection: psycopg.Connection = Depends(get_connection)) -> Dict:
     try:
         connection.execute("SELECT 1")
         return {"status": "ready"}
@@ -74,7 +74,7 @@ def ready(connection: psycopg.Connection = Depends(get_connection)) -> dict:
 
 
 @app.get("/api/tasks")
-def list_tasks(connection: psycopg.Connection = Depends(get_connection)) -> list[dict]:
+def list_tasks(connection: psycopg.Connection = Depends(get_connection)) -> List[Dict]:
     rows = connection.execute(
         "SELECT id, title, completed FROM tasks ORDER BY id DESC"
     ).fetchall()
@@ -85,7 +85,7 @@ def list_tasks(connection: psycopg.Connection = Depends(get_connection)) -> list
 def create_task(
     payload: TaskCreate,
     connection: psycopg.Connection = Depends(get_connection),
-) -> dict:
+) -> Dict:
     row = connection.execute(
         "INSERT INTO tasks (title) VALUES (%s) RETURNING id, title, completed",
         (payload.title,),
@@ -99,7 +99,7 @@ def update_task(
     task_id: int,
     payload: TaskUpdate,
     connection: psycopg.Connection = Depends(get_connection),
-) -> dict:
+) -> Dict:
     row = connection.execute(
         """
         UPDATE tasks

@@ -28,7 +28,9 @@
     <ul id="tasks"></ul>
   </main>
   <script>
-    const API = 'http://localhost:8000';
+    const API = window.location.hostname === 'localhost' 
+      ? 'http://localhost:8000' 
+      : `${window.location.protocol}//${window.location.hostname}:8000`;
     const list = document.querySelector('#tasks');
     const status = document.querySelector('#status');
 

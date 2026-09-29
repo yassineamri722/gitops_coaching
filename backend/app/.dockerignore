@@ -8,9 +8,3 @@ venv/
 .git
 .env
 *.md
-# frontend/.dockerignore
-.git
-.gitignore
-.env
-node_modules/
-*.md

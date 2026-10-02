@@ -134,3 +134,4 @@ jobs:
       - name: Echo deploy placeholder
         run: |
           echo "Deploy stage placeholder: the real deployment will come later with Argo CD and Minikube."
+#test n1

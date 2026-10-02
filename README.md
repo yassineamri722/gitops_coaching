@@ -2,6 +2,8 @@
 
 A small three-tier task-management application prepared for later DevOps work.
 
+The repository now includes a GitHub Actions CI/CD pipeline that covers checkout, build, test, SonarCloud code scanning, Trivy Docker image scanning, Docker Hub publishing, and a simple deploy placeholder. The deployment stop is intentional: the real release flow will later move to Argo CD and Minikube.
+
 ## Architecture
 
 - **Frontend:** static HTML/CSS/JavaScript
@@ -76,9 +78,9 @@ Open `http://localhost:3000` in a browser.
 
 ## Next DevOps steps
 
-1. Add application tests and improve configuration management.
-2. Create container images and local orchestration configuration.
-3. Add Kubernetes manifests and a Helm chart in a separate GitOps repository.
+1. Review the GitHub Actions workflow in [.github/workflows/ci-cd.yml](.github/workflows/ci-cd.yml) and set the Docker Hub secrets.
+2. Read the pipeline theory guide in [docs/ci-cd.md](docs/ci-cd.md) for the meaning of each stage.
+3. Add GitOps and Kubernetes deployment manifests in a later step, outside this repository.
 4. Deploy locally to Minikube, then connect Argo CD and EKS.
 5. Provision AWS infrastructure with Terraform.
 

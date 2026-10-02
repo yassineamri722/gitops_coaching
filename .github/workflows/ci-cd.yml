@@ -97,14 +97,14 @@ jobs:
         run: docker build -t "${{ steps.images.outputs.frontend_image }}:${{ steps.images.outputs.tag }}" frontend
 
       - name: Scan backend image
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.images.outputs.backend_image }}:${{ steps.images.outputs.tag }}
           format: table
           exit-code: 0
 
       - name: Scan frontend image
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.images.outputs.frontend_image }}:${{ steps.images.outputs.tag }}
           format: table

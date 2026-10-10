@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 #coaching
-from contextlib import asynccontextmanager
 import os
+from contextlib import asynccontextmanager
 from typing import Dict, Generator, List
 
 import psycopg
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from typing_extensions import Annotated
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
@@ -67,7 +70,9 @@ def health() -> Dict:
 
 
 @app.get("/ready")
-def ready(connection: psycopg.Connection = Depends(get_connection)) -> Dict:
+def ready(
+    connection: Annotated[psycopg.Connection, Depends(get_connection)],
+) -> Dict:
     try:
         connection.execute("SELECT 1")
         return {"status": "ready"}
@@ -76,7 +81,9 @@ def ready(connection: psycopg.Connection = Depends(get_connection)) -> Dict:
 
 
 @app.get("/api/tasks")
-def list_tasks(connection: psycopg.Connection = Depends(get_connection)) -> List[Dict]:
+def list_tasks(
+    connection: Annotated[psycopg.Connection, Depends(get_connection)],
+) -> List[Dict]:
     rows = connection.execute(
         "SELECT id, title, completed FROM tasks ORDER BY id DESC"
     ).fetchall()
@@ -86,7 +93,7 @@ def list_tasks(connection: psycopg.Connection = Depends(get_connection)) -> List
 @app.post("/api/tasks", status_code=201)
 def create_task(
     payload: TaskCreate,
-    connection: psycopg.Connection = Depends(get_connection),
+    connection: Annotated[psycopg.Connection, Depends(get_connection)],
 ) -> Dict:
     row = connection.execute(
         "INSERT INTO tasks (title) VALUES (%s) RETURNING id, title, completed",
@@ -100,7 +107,7 @@ def create_task(
 def update_task(
     task_id: int,
     payload: TaskUpdate,
-    connection: psycopg.Connection = Depends(get_connection),
+    connection: Annotated[psycopg.Connection, Depends(get_connection)],
 ) -> Dict:
     row = connection.execute(
         """
@@ -117,12 +124,13 @@ def update_task(
     return serialize(row)
 
 
-@app.delete("/api/tasks/{task_id}", status_code=204)
+@app.delete("/api/tasks/{task_id}", response_class=Response)
 def delete_task(
     task_id: int,
-    connection: psycopg.Connection = Depends(get_connection),
+    connection: Annotated[psycopg.Connection, Depends(get_connection)],
 ) -> None:
     result = connection.execute("DELETE FROM tasks WHERE id = %s", (task_id,))
     if result.rowcount == 0:
         raise HTTPException(status_code=404, detail="task not found")
     connection.commit()
+    return Response(status_code=204)

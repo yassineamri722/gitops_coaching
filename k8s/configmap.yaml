@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: taskapp-config
+ namespace: taskapp
+data:
+ POSTGRES_DB: taskapp
+ POSTGRES_USER: taskapp
+ CORS_ORIGINS: http://taskapp.local,http://localhost:3000

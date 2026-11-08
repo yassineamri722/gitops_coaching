@@ -145,5 +145,6 @@ Open `http://localhost:3000` in a browser.
 3. Add GitOps and Kubernetes deployment manifests in a later step, outside this repository.
 4. Deploy locally to Minikube, then connect Argo CD and EKS.
 5. Provision AWS infrastructure with Terraform.
+6. Follow the [Argo CD and Minikube deployment guide](docs/argocd.md) to deploy the Helm chart from Git.
 
-No container, Kubernetes, cloud, or infrastructure files are included at this stage.
+The repository includes local Docker, Kubernetes, and Helm files for the development deployment path.

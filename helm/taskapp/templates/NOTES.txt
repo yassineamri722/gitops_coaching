@@ -1,0 +1,8 @@
+Release {{ .Release.Name }} installée dans le namespace {{ .Release.Namespace }} (revision {{ .Release.Revision }}).
+{{- if .Values.ingress.enabled }}
+Application : http://{{ .Values.ingress.host }}
+Si besoin, ajouter l'entrée DNS locale :
+echo "$(minikube ip) {{ .Values.ingress.host }}" | sudo tee -a /etc/hosts
+{{- end }}
+Vérifier : kubectl get pods -n {{ .Release.Namespace }}
+Tester : helm test {{ .Release.Name }} -n {{ .Release.Namespace }}

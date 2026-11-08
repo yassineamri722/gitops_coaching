@@ -1,0 +1,66 @@
+nameOverride: ""
+fullnameOverride: ""
+
+config:
+  postgresDb: taskapp
+  postgresUser: taskapp
+  corsOrigins: http://taskapp.local
+
+secret:
+  # Default for the lab; provide a stronger value in production.
+  postgresPassword: taskapp-password
+
+frontend:
+  replicaCount: 2
+  image:
+    repository: gitops_coaching-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 3000
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+backend:
+  replicaCount: 2
+  image:
+    repository: gitops_coaching-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 8000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+postgres:
+  image:
+    repository: postgres
+    tag: 15-alpine
+    pullPolicy: IfNotPresent
+  service:
+    port: 5432
+  storage:
+    size: 1Gi
+    storageClassName: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+ingress:
+  enabled: true
+  className: nginx
+  host: taskapp.local
